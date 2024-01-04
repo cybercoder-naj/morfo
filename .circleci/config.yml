@@ -16,7 +16,7 @@ jobs:
       - checkout
       - run: |
           cargo --version
-          cargo fmt -all -- --check
+          cargo fmt --all -- --check
           cargo clippy
   publish:
     docker:
@@ -33,8 +33,20 @@ workflows:
       - lint
   release:
     jobs:
-      - test
-      - lint
+      - test:
+          filters:
+            tags:
+              only: 
+                - /^v.*/
+            branches:
+              ignore: /.*/
+      - lint:
+          filters:
+            tags:
+              only: 
+                - /^v.*/
+            branches:
+              ignore: /.*/
       - publish:
           requires:
             - test
