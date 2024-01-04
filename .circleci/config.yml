@@ -37,14 +37,8 @@ jobs:
 workflows:
   main:
     jobs:
-      - test:
-          filters:
-            branches:
-              ignore: main
-      - lint:
-          filters:
-            branches:
-              ignore: main
+      - test
+      - lint
       - check_version:
           filters:
             branches:
