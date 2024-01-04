@@ -27,7 +27,7 @@ jobs:
           cargo publish --token $CRATES_TOKEN
 
 workflows:
-  main-workflow:
+  main:
     jobs:
       - test
       - lint
