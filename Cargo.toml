@@ -1,6 +1,6 @@
 [package]
 name = "morfo"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license-file = "LICENSE"
 description = "This is an automatic build tool for your C/C++ projects that analyses your code and executes it without having to write any external code."

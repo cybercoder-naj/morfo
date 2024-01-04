@@ -26,12 +26,29 @@ jobs:
       - run: |
           cargo --version
           cargo publish --token $CRATES_TOKEN
+  check_version:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run: ./check_version.sh
+    
 
 workflows:
   main:
     jobs:
-      - test
-      - lint
+      - test:
+          filters:
+            branches:
+              ignore: main
+      - lint:
+          filters:
+            branches:
+              ignore: main
+      - check_version:
+          filters:
+            branches:
+              ignore: main
   release:
     jobs:
       - test:
