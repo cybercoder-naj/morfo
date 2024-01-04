@@ -42,9 +42,7 @@ workflows:
       - check_version:
           filters:
             branches:
-              ignore: 
-                - main
-                - /^chore/.*/
+              ignore: main
   release:
     jobs:
       - test:
