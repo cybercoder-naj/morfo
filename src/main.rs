@@ -3,7 +3,11 @@ use clap::Parser;
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /// The config file to use, defaults to $HOME/.config/morfo/config.toml
+    /// The main file to build
+    #[arg(value_name = "main")]
+    main: String,
+
+    /// The config file to use
     #[arg(
         long,
         default_value = "$HOME/.config/morfo/config.toml",
