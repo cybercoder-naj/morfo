@@ -7,6 +7,10 @@ struct Cli {
     #[arg(value_name = "main")]
     main: String,
 
+    /// The directory to use
+    #[arg(short, long, default_value = ".")]
+    dir: String,
+
     /// The config file to use
     #[arg(
         long,
