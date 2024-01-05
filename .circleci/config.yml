@@ -8,6 +8,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          pwd
           ls
           cargo --version
           cargo test
