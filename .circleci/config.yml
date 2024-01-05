@@ -8,6 +8,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          pwd
           cargo --version
           cargo test
   lint:
