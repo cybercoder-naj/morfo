@@ -1,4 +1,4 @@
-use std::{error::Error, path::Path};
+use std::{error::Error, path::{Path, PathBuf}};
 
 /// Reads the contents of a file
 ///
@@ -41,15 +41,17 @@ pub fn read_config_file(filepath: &str) -> Result<String, Box<dyn Error>> {
 /// ```
 /// let config_file = morfo::config::find_config_file();
 /// ```
-pub fn find_config_file() -> Result<&'static Path, Box<dyn Error>> {
+pub fn find_config_file() -> Result<PathBuf, Box<dyn Error>> {
     let local_config = Path::new("./morfo.toml");
     if local_config.exists() {
-        return Ok(local_config);
+        return Ok(local_config.to_path_buf());
     }
 
-    let home_config = Path::new("~/.config/morfo/config.toml");
+    let home = env!("HOME");
+    let global_config = format!("{}/.config/morfo/config.toml", home);
+    let home_config = Path::new(&global_config);
     if home_config.exists() {
-        Ok(home_config)
+        Ok(home_config.to_path_buf())
     } else {
         Err("No config file found".into())
     }
@@ -135,7 +137,8 @@ mod tests {
         }
 
         // Create the global config file
-        let global_config = "~/.config/morfo/config.toml";
+        let home = env!("HOME");
+        let global_config = &format!("{}/.config/morfo/config.toml", home);
         let file_path = Path::new(global_config);
 
         // If the file exists, save the contents for teardown
