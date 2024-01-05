@@ -10,6 +10,7 @@ jobs:
       - run: |
           pwd
           ls -a
+          ls examples/custom_build -a
           cargo --version
           cargo test
   lint:
