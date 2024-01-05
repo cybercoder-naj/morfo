@@ -95,7 +95,7 @@ mod tests {
         let original_dir = std::env::current_dir().unwrap();
 
         // examples/custom_build has a morfo.toml file
-        std::env::set_current_dir(Path::new("examples/custom_build")).unwrap();
+        std::env::set_current_dir(Path::new("./examples/custom_build")).unwrap();
 
         // TEST FUNCTION
         let config_file = find_config_file();
