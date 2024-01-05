@@ -1,21 +1,21 @@
 use std::{error::Error, path::Path};
 
 /// Reads the contents of a file
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `filepath` - The path to the file
-/// 
+///
 /// # Returns
-/// 
+///
 /// The contents of the file
-/// 
+///
 /// # Errors
-/// 
+///
 /// If the file cannot be read
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```
 /// let contents = morfo::config::read_config_file("./morfo.toml");
 /// ```
@@ -27,17 +27,17 @@ pub fn read_config_file(filepath: &str) -> Result<String, Box<dyn Error>> {
 /// Finds the config file
 ///   1. If there is a local config file (./morfo.toml), use that.
 ///   2. If there is a global config file (~/.config/morfo/config.toml), use that.
-/// 
+///
 /// # Returns
-/// 
+///
 /// The path to the config file
-/// 
+///
 /// # Errors
-/// 
+///
 /// If there is no config file
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```
 /// let config_file = morfo::config::find_config_file();
 /// ```
@@ -64,8 +64,11 @@ pub fn parse_config_file(config: &str) -> Result<(), Box<dyn Error>> {
 
 #[cfg(test)]
 mod tests {
+    use std::{
+        fs::{self, File},
+        io::Write,
+    };
     use tempfile::NamedTempFile;
-    use std::{io::Write, fs::{File, self}};
 
     use super::*;
 
@@ -99,7 +102,7 @@ mod tests {
 
         // TEST FUNCTION
         let config_file = find_config_file();
-        
+
         // ASSERTIONS
         // Assert that the local config file is found
         assert!(config_file.is_ok());
@@ -130,20 +133,20 @@ mod tests {
         if let Some(parent) = file_path.parent() {
             fs::create_dir_all(parent).unwrap();
         }
-        let _file = File::create(&file_path).unwrap();
+        let _file = File::create(file_path).unwrap();
 
         // TEST FUNCTION
         let config_file = find_config_file();
-        
+
         // ASSERTIONS
         assert!(config_file.is_ok());
         assert_eq!(config_file.unwrap().to_str().unwrap(), global_config);
 
         // TEARDOWN
         if let Some(data) = original_file {
-            fs::write(&file_path, data).unwrap();
+            fs::write(file_path, data).unwrap();
         } else {
-            fs::remove_file(&file_path).unwrap();
+            fs::remove_file(file_path).unwrap();
         }
         std::env::set_current_dir(original_dir).unwrap();
     }
