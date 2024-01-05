@@ -1,4 +1,7 @@
-use std::{error::Error, path::{Path, PathBuf}};
+use std::{
+    error::Error,
+    path::{Path, PathBuf},
+};
 
 /// Reads the contents of a file
 ///
