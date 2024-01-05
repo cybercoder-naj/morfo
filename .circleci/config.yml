@@ -9,7 +9,7 @@ jobs:
       - checkout
       - run: |
           pwd
-          ls
+          ls -a
           cargo --version
           cargo test
   lint:
