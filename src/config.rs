@@ -98,7 +98,14 @@ mod tests {
         let original_dir = std::env::current_dir().unwrap();
 
         // examples/custom_build has a morfo.toml file
-        std::env::set_current_dir(Path::new("./examples/custom_build")).unwrap();
+        let cargo_manifest_dir = env!("CARGO_MANIFEST_DIR");
+        let working_dir = Path::new("examples/custom_build");
+        if !cargo_manifest_dir.starts_with("error") {
+            let working_dir = Path::new(cargo_manifest_dir).join(working_dir);
+            std::env::set_current_dir(working_dir).unwrap();
+        } else {
+            std::env::set_current_dir(working_dir).unwrap();
+        }
 
         // TEST FUNCTION
         let config_file = find_config_file();
@@ -118,7 +125,14 @@ mod tests {
         let original_dir = std::env::current_dir().unwrap();
 
         // examples/hello_world has no morfo.toml file
-        std::env::set_current_dir(Path::new("examples/hello_world")).unwrap();
+        let cargo_manifest_dir = env!("CARGO_MANIFEST_DIR");
+        let working_dir = Path::new("examples/hello_world");
+        if !cargo_manifest_dir.starts_with("error") {
+            let working_dir = Path::new(cargo_manifest_dir).join(working_dir);
+            std::env::set_current_dir(working_dir).unwrap();
+        } else {
+            std::env::set_current_dir(working_dir).unwrap();
+        }
 
         // Create the global config file
         let global_config = "~/.config/morfo/config.toml";
