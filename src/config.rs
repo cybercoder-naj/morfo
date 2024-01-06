@@ -6,6 +6,11 @@ use std::{
 /// `Config` holds the configuration for the compiler.
 ///
 /// It includes the compiler command (`cc`) and the compiler flags (`cflags`).
+/// This struct is created by [`ConfigBuilder`].
+/// This struct can be created from a config file using [`parse_config_file`].
+///
+/// [`ConfigBuilder`]: struct.ConfigBuilder.html
+/// [`parse_config_file`]: fn.parse_config_file.html
 ///
 /// # Examples
 ///
@@ -56,6 +61,23 @@ impl Config {
     }
 }
 
+/// `ConfigBuilder` is a builder for [`Config`].
+///
+/// [`Config`]: struct.Config.html
+///
+/// # Examples
+///
+/// ```
+/// use morfo::config::ConfigBuilder;
+///
+/// let config = ConfigBuilder::default()
+///     .set_cc("gcc")
+///     .add_cflag("-O2")
+///     .build();
+///
+/// assert_eq!(config.get_cc(), "gcc");
+/// assert_eq!(config.get_cflags(), &vec!["-O2"]);
+/// ```
 #[derive(Default)]
 pub struct ConfigBuilder {
     cc: String,
@@ -165,7 +187,10 @@ pub fn parse_config_file(filepath: Option<&str>) -> Result<Config, Box<dyn Error
         read_config_file(filepath)?
     } else {
         let config_file = find_config_file()?;
-        read_config_file(config_file.to_str().unwrap())?
+        let filepath = config_file
+            .to_str()
+            .ok_or("Invalid UTF-8 sequence in file path")?;
+        read_config_file(filepath)?
     };
 
     let config: Config = toml::from_str(&config)?;
