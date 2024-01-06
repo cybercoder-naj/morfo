@@ -1,6 +1,6 @@
 [package]
 name = "morfo"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 license-file = "LICENSE"
 description = "This is an automatic build tool for your C/C++ projects that analyses your code and executes it without having to write any external code."
@@ -8,6 +8,7 @@ homepage = "https://cybercoder-naj.github.io/morfo"
 documentation = "https://docs.rs/morfo"
 repository = "https://github.com/cybercoder-naj/morfo"
 readme = "README.md"
+build = "build.rs"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
