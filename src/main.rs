@@ -12,10 +12,7 @@ struct Cli {
     dir: String,
 
     /// The config file to use
-    #[arg(
-        long,
-        value_name = "config"
-    )]
+    #[arg(long, value_name = "config")]
     config: Option<String>,
 
     /// Display all the build steps

@@ -1,17 +1,60 @@
 use std::{
     error::Error,
-    path::{Path, PathBuf}
+    path::{Path, PathBuf},
 };
 
 #[derive(Debug, serde::Deserialize)]
 pub struct MorfoConfig {
-    pub cc: String,
-    pub cflags: Vec<String>,
+    cc: String,
+    cflags: Vec<String>,
+}
+
+impl MorfoConfig {
+    pub fn get_cc(&self) -> &String {
+        &self.cc
+    }
+
+    pub fn get_cflags(&self) -> &Vec<String> {
+        &self.cflags
+    }
 }
 
 #[derive(Debug, serde::Deserialize)]
 pub struct Config {
-    pub morfo: MorfoConfig
+    pub morfo: MorfoConfig,
+}
+
+pub struct ConfigBuilder {
+    cc: String,
+    cflags: Vec<String>,
+}
+
+impl ConfigBuilder {
+    pub fn new() -> Self {
+        Self {
+            cc: String::new(),
+            cflags: vec![],
+        }
+    }
+
+    pub fn set_cc(mut self, cc: &str) -> Self {
+        self.cc = cc.to_string();
+        self
+    }
+
+    pub fn add_cflag(mut self, cflag: &str) -> Self {
+        self.cflags.push(cflag.to_string());
+        self
+    }
+
+    pub fn build(self) -> Config {
+        Config {
+            morfo: MorfoConfig {
+                cc: self.cc,
+                cflags: self.cflags,
+            },
+        }
+    }
 }
 
 /// Reads the contents of a file
@@ -75,21 +118,21 @@ pub fn find_config_file() -> Result<PathBuf, Box<dyn Error>> {
 /// Parses the correct config file.
 /// If the filepath is provided, it will parse that file.
 /// If the filepath is not provided, it will find the config file and parse that.
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `filepath` - The path to the config file. If None, it will find the config file.
-/// 
+///
 /// # Returns
-/// 
+///
 /// The parsed config file
-/// 
+///
 /// # Errors
-/// 
+///
 /// If the config file cannot be read, found, or parsed.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```
 /// let config = morfo::config::parse_config_file(Option::Some("./morfo.toml"));
 /// ```
