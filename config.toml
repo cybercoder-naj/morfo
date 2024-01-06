@@ -1,0 +1,7 @@
+# This is the default configuration file for morfo.
+
+# The compiler to use
+cc = "gcc"
+
+# The flags to pass to the compiler on every invocation
+cflags = ["-g"]
