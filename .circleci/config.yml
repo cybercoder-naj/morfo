@@ -2,6 +2,7 @@ version: 2.1
 
 jobs:
   test:
+    working_directory: ~/morfo
     docker:
       - image: cimg/rust:1.75.0
     steps:
@@ -26,12 +27,23 @@ jobs:
       - run: |
           cargo --version
           cargo publish --token $CRATES_TOKEN
+  check_version:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run: ./check_version.sh
+    
 
 workflows:
   main:
     jobs:
       - test
       - lint
+      - check_version:
+          filters:
+            branches:
+              ignore: main
   release:
     jobs:
       - test:
