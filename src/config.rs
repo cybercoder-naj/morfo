@@ -4,12 +4,12 @@ use std::{
 };
 
 #[derive(Debug, serde::Deserialize)]
-pub struct MorfoConfig {
+pub struct Config {
     cc: String,
     cflags: Vec<String>,
 }
 
-impl MorfoConfig {
+impl Config {
     pub fn get_cc(&self) -> &String {
         &self.cc
     }
@@ -17,11 +17,6 @@ impl MorfoConfig {
     pub fn get_cflags(&self) -> &Vec<String> {
         &self.cflags
     }
-}
-
-#[derive(Debug, serde::Deserialize)]
-pub struct Config {
-    pub morfo: MorfoConfig,
 }
 
 pub struct ConfigBuilder {
@@ -49,10 +44,8 @@ impl ConfigBuilder {
 
     pub fn build(self) -> Config {
         Config {
-            morfo: MorfoConfig {
-                cc: self.cc,
-                cflags: self.cflags,
-            },
+            cc: self.cc,
+            cflags: self.cflags,
         }
     }
 }
@@ -178,7 +171,6 @@ mod tests {
         // SETUP
         // Create a temporary file to write toml_contents to
         let toml_contents = r#"
-            [morfo]
             key = 'value'"#;
 
         let mut temp_file = NamedTempFile::new().unwrap();
@@ -252,7 +244,6 @@ mod tests {
         // SETUP
         // Create a temporary file to write toml_contents to
         let toml_contents = r#"
-            [morfo]
             cc = 'gcc'
             cflags = ['-Wall', '-Wextra']"#;
 
@@ -266,7 +257,7 @@ mod tests {
         // ASSERTIONS
         assert!(config.is_ok());
         let config = config.unwrap();
-        assert_eq!(config.morfo.cc, "gcc");
-        assert_eq!(config.morfo.cflags, vec!["-Wall", "-Wextra"]);
+        assert_eq!(config.cc, "gcc");
+        assert_eq!(config.cflags, vec!["-Wall", "-Wextra"]);
     }
 }
