@@ -14,5 +14,9 @@ readme = "README.md"
 
 [dependencies]
 clap = { version = "4.4.12", features = ["derive"] }
+serde = { version = "1.0.194", features = ["derive"] }
 tempfile = "3.9.0"
 toml = "0.8.8"
+
+[profile.dev]
+debug = true
