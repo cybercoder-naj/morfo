@@ -8,7 +8,7 @@ use std::{
 /// It includes the compiler command (`cc`) and the compiler flags (`cflags`).
 /// This struct is created by [`ConfigBuilder`].
 /// This struct can be created from a config file using [`parse_config_file`].
-/// 
+///
 /// [`ConfigBuilder`]: struct.ConfigBuilder.html
 /// [`parse_config_file`]: fn.parse_config_file.html
 ///
@@ -68,6 +68,8 @@ impl Config {
 /// # Examples
 ///
 /// ```
+/// use morfo::config::ConfigBuilder;
+///
 /// let config = ConfigBuilder::default()
 ///     .set_cc("gcc")
 ///     .add_cflag("-O2")
