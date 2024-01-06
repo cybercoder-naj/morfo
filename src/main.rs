@@ -1,6 +1,6 @@
 use clap::Parser;
 
-#[derive(Parser)]
+#[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
     /// The main file to build
@@ -12,12 +12,8 @@ struct Cli {
     dir: String,
 
     /// The config file to use
-    #[arg(
-        long,
-        default_value = "$HOME/.config/morfo/config.toml",
-        value_name = "config"
-    )]
-    config: String,
+    #[arg(long, value_name = "config")]
+    config: Option<String>,
 
     /// Display all the build steps
     #[arg(short, long, default_value = "false")]
@@ -27,5 +23,5 @@ struct Cli {
 fn main() {
     let args = Cli::parse();
 
-    println!("morfo {}", args.verbose);
+    println!("morfo {:?}", args);
 }
