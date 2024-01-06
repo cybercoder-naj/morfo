@@ -187,7 +187,10 @@ pub fn parse_config_file(filepath: Option<&str>) -> Result<Config, Box<dyn Error
         read_config_file(filepath)?
     } else {
         let config_file = find_config_file()?;
-        read_config_file(config_file.to_str().unwrap())?
+        let filepath = config_file
+            .to_str()
+            .ok_or("Invalid UTF-8 sequence in file path")?;
+        read_config_file(filepath)?
     };
 
     let config: Config = toml::from_str(&config)?;
