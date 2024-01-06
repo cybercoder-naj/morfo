@@ -1,9 +1,13 @@
 use std::fs;
 
 fn main() {
-  let home = env!("HOME");
-  let config_path = format!("{}/.config/morfo/config.toml", home);
+    let home = env!("HOME");
+    let config_dir = format!("{}/.config/morfo/", home);
+    let config_path = format!("{}/config.toml", config_dir);
 
-  let config = fs::read("./config.toml").unwrap();
-  fs::write(config_path, config).unwrap();
+    // Create directory if it doesn't exist
+    fs::create_dir_all(config_dir).unwrap();
+
+    // Copy the file
+    fs::copy("./config.toml", config_path).unwrap();
 }
