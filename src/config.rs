@@ -11,7 +11,7 @@ use std::{
 ///
 /// ```
 /// use morfo::config::ConfigBuilder;
-/// 
+///
 /// let config = ConfigBuilder::default()
 ///     .set_cc("gcc")
 ///     .add_cflag("-O2")
@@ -33,7 +33,7 @@ impl Config {
     ///
     /// ```
     /// use morfo::config::ConfigBuilder;
-    /// 
+    ///
     /// let config = ConfigBuilder::default().set_cc("gcc").build();
     /// assert_eq!(config.get_cc(), "gcc");
     /// ```
@@ -47,7 +47,7 @@ impl Config {
     ///
     /// ```
     /// use morfo::config::ConfigBuilder;
-    /// 
+    ///
     /// let config = ConfigBuilder::default().add_cflag("-O2").build();
     /// assert_eq!(config.get_cflags(), &vec!["-O2"]);
     /// ```
