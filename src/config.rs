@@ -3,6 +3,23 @@ use std::{
     path::{Path, PathBuf},
 };
 
+/// `Config` holds the configuration for the compiler.
+///
+/// It includes the compiler command (`cc`) and the compiler flags (`cflags`).
+///
+/// # Examples
+///
+/// ```
+/// use morfo::config::ConfigBuilder;
+/// 
+/// let config = ConfigBuilder::default()
+///     .set_cc("gcc")
+///     .add_cflag("-O2")
+///     .build();
+///
+/// assert_eq!(config.get_cc(), "gcc");
+/// assert_eq!(config.get_cflags(), &vec!["-O2"]);
+/// ```
 #[derive(Debug, serde::Deserialize)]
 pub struct Config {
     cc: String,
@@ -10,28 +27,42 @@ pub struct Config {
 }
 
 impl Config {
+    /// Returns the compiler command.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use morfo::config::ConfigBuilder;
+    /// 
+    /// let config = ConfigBuilder::default().set_cc("gcc").build();
+    /// assert_eq!(config.get_cc(), "gcc");
+    /// ```
     pub fn get_cc(&self) -> &String {
         &self.cc
     }
 
+    /// Returns the compiler flags.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use morfo::config::ConfigBuilder;
+    /// 
+    /// let config = ConfigBuilder::default().add_cflag("-O2").build();
+    /// assert_eq!(config.get_cflags(), &vec!["-O2"]);
+    /// ```
     pub fn get_cflags(&self) -> &Vec<String> {
         &self.cflags
     }
 }
 
+#[derive(Default)]
 pub struct ConfigBuilder {
     cc: String,
     cflags: Vec<String>,
 }
 
 impl ConfigBuilder {
-    pub fn new() -> Self {
-        Self {
-            cc: String::new(),
-            cflags: vec![],
-        }
-    }
-
     pub fn set_cc(mut self, cc: &str) -> Self {
         self.cc = cc.to_string();
         self
