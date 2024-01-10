@@ -316,4 +316,40 @@ mod tests {
         assert_eq!(config.cc, "gcc");
         assert_eq!(config.cflags, vec!["-Wall", "-Wextra"]);
     }
+
+    #[test]
+    fn test_parse_global_config_file() {
+        // Create the global config file
+        let home = env!("HOME");
+        let global_config = &format!("{}/.config/morfo/config.toml", home);
+        let file_path = Path::new(global_config);
+
+        // If the file exists, save the contents for teardown
+        let original_file = if file_path.exists() {
+            Some(file_path.to_str().unwrap())
+        } else {
+            None
+        };
+        if let Some(parent) = file_path.parent() {
+            fs::create_dir_all(parent).unwrap();
+        }
+
+        fs::copy("./config.toml", file_path).unwrap();
+
+        // TEST FUNCTION
+        let config_file = parse_config_file(Option::None);
+
+        // ASSERTIONS
+        assert!(config_file.is_ok());
+        let config_file = config_file.unwrap();
+        assert_eq!(config_file.cc, "gcc");
+        assert_eq!(config_file.cflags, vec!["-g"]);
+
+        // TEARDOWN
+        if let Some(data) = original_file {
+            fs::write(file_path, data).unwrap();
+        } else {
+            fs::remove_file(file_path).unwrap();
+        }
+    }
 }
