@@ -1,4 +1,6 @@
 use clap::Parser;
+use colored::Colorize;
+use morfo::{config::parse_config_file, execute};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -23,5 +25,15 @@ struct Cli {
 fn main() {
     let args = Cli::parse();
 
-    println!("morfo {:?}", args);
+    let config = parse_config_file(args.config.as_deref());
+    if config.is_err() {
+        eprintln!(
+            "{}",
+            format!("Error parsing config file: {:?}", config).red()
+        );
+        std::process::exit(1);
+    }
+    let config = config.unwrap();
+
+    execute(&args.main, config, &mut std::io::stdout());
 }
