@@ -1,3 +1,5 @@
+use std::process;
+
 use clap::Parser;
 use colored::Colorize;
 use morfo::{config::parse_config_file, execute};
@@ -31,9 +33,13 @@ fn main() {
             "{}",
             format!("Error parsing config file: {:?}", config).red()
         );
-        std::process::exit(1);
+        process::exit(1);
     }
     let config = config.unwrap();
 
-    execute(&args.main, config, &mut std::io::stdout());
+    let result = execute(&args.main, config, &mut std::io::stdout());
+    if result.is_err() {
+        eprintln!("{}", format!("Error executing: {:?}", result).red());
+        process::exit(1);
+    }
 }
