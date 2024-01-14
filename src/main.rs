@@ -5,7 +5,7 @@ use morfo::{config::parse_config_file, execute};
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /// The main file to build
+    /// The main file to execute
     #[arg(value_name = "main")]
     main: String,
 

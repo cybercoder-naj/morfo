@@ -20,6 +20,7 @@ use std::{
 /// let config = ConfigBuilder::default()
 ///     .set_cc("gcc")
 ///     .add_cflag("-O2")
+///     .set_build_dir(".out")
 ///     .build();
 ///
 /// assert_eq!(config.get_cc(), "gcc");
@@ -29,6 +30,7 @@ use std::{
 pub struct Config {
     cc: String,
     cflags: Vec<String>,
+    builddir: Option<String>,
 }
 
 impl Config {
@@ -59,6 +61,24 @@ impl Config {
     pub fn get_cflags(&self) -> &Vec<String> {
         &self.cflags
     }
+
+    /// Returns the build directory.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use morfo::config::ConfigBuilder;
+    /// use std::path::PathBuf;
+    ///
+    /// let config = ConfigBuilder::default().build();
+    /// assert_eq!(config.get_build_dir(), PathBuf::from(".out"));
+    /// ```
+    pub fn get_build_dir(&self) -> PathBuf {
+        match &self.builddir {
+            Some(build_dir) => Path::new(build_dir).to_path_buf(),
+            None => Path::new(".out").to_path_buf(),
+        }
+    }
 }
 
 /// `ConfigBuilder` is a builder for [`Config`].
@@ -73,6 +93,7 @@ impl Config {
 /// let config = ConfigBuilder::default()
 ///     .set_cc("gcc")
 ///     .add_cflag("-O2")
+///     .set_build_dir(".out")
 ///     .build();
 ///
 /// assert_eq!(config.get_cc(), "gcc");
@@ -82,6 +103,7 @@ impl Config {
 pub struct ConfigBuilder {
     cc: String,
     cflags: Vec<String>,
+    build_dir: Option<PathBuf>,
 }
 
 impl ConfigBuilder {
@@ -95,10 +117,16 @@ impl ConfigBuilder {
         self
     }
 
+    pub fn set_build_dir(mut self, build_dir: &str) -> Self {
+        self.build_dir = Some(Path::new(build_dir).to_path_buf());
+        self
+    }
+
     pub fn build(self) -> Config {
         Config {
             cc: self.cc,
             cflags: self.cflags,
+            builddir: self.build_dir.map(|p| p.to_str().unwrap().to_string()),
         }
     }
 }
