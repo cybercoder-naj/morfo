@@ -56,11 +56,14 @@ fn run<W: Write>(main_file: &str, config: &Config, out: &mut W) -> Result<(), Bo
     }
 
     // use command to invoke the executable
-    let run_project = std::process::Command::new(executable)
-        .arg(main_file)
-        .output()?;
+    let mut run_cmd = Command::new(executable);
+
+    if env::var("VERBOSITY").unwrap_or_default() == "1" {
+        writeln!(out, "{}", format!("{:?}", run_cmd).replace("\"", ""))?;
+    }
 
     // pipe the output to out
+    let run_project = run_cmd.output()?;
     out.write_all(&run_project.stdout)?;
 
     Ok(())
