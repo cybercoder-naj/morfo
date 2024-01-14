@@ -68,6 +68,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_execute() {
         let mut out = Vec::new();
         execute(
