@@ -1,4 +1,4 @@
-use std::{error::Error, fs::create_dir, io::Write, path::Path, process::Command};
+use std::{env, error::Error, fs::create_dir, io::Write, path::Path, process::Command};
 
 use act::ACT;
 use config::Config;
@@ -13,30 +13,35 @@ pub fn execute<W: Write>(
     out: &mut W,
 ) -> Result<(), Box<dyn Error>> {
     let act = ACT::build(main_file);
-    compile(&act, &config)?;
+    compile(&act, &config, out)?;
 
     run(main_file, &config, out)?;
     Ok(())
 }
 
-pub fn compile(act: &ACT, config: &Config) -> Result<(), Box<dyn Error>> {
+fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> Result<(), Box<dyn Error>> {
     // create .out directory if it doesn't exist
     if !Path::new(".out").exists() {
         create_dir(".out")?;
     }
 
     for dependency in &act.dependencies {
-        compile(dependency, config)?;
+        compile(dependency, config, out)?;
     }
 
     // use command to print pwd
-    let status = Command::new(config.get_cc())
+    let mut compile_cmd = Command::new(config.get_cc());
+    compile_cmd
         .arg(config.get_cflags().join(" ").as_str())
         .arg(&act.name)
         .arg("-o")
-        .arg(config.get_build_dir().join(utils::file_name(&act.name)))
-        .status()?;
+        .arg(config.get_build_dir().join(utils::file_name(&act.name)));
 
+    if env::var("VERBOSITY").unwrap_or_default() == "1" {
+        writeln!(out, "{}", format!("{:?}", compile_cmd).replace("\"", ""))?;
+    }
+
+    let status = compile_cmd.status()?;
     if !status.success() {
         return Err(format!("Error compiling {}", act.name).into());
     }

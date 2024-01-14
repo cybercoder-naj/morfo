@@ -1,4 +1,4 @@
-use std::process;
+use std::{env, process};
 
 use clap::Parser;
 use colored::Colorize;
@@ -26,6 +26,10 @@ struct Cli {
 
 fn main() {
     let args = Cli::parse();
+
+    if args.verbose {
+        env::set_var("VERBOSITY", "1");
+    }
 
     let config = parse_config_file(args.config.as_deref());
     if config.is_err() {
