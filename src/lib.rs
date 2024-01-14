@@ -11,11 +11,12 @@ pub fn execute<W: Write>(
     main_file: &str,
     config: Config,
     out: &mut W,
+    prog_args: Vec<String>,
 ) -> Result<(), Box<dyn Error>> {
     let act = ACT::build(main_file);
     compile(&act, &config, out)?;
 
-    run(main_file, &config, out)?;
+    run(main_file, &config, out, prog_args)?;
     Ok(())
 }
 
@@ -49,7 +50,12 @@ fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> Result<(), Box<
     Ok(())
 }
 
-fn run<W: Write>(main_file: &str, config: &Config, out: &mut W) -> Result<(), Box<dyn Error>> {
+fn run<W: Write>(
+    main_file: &str,
+    config: &Config,
+    out: &mut W,
+    prog_args: Vec<String>,
+) -> Result<(), Box<dyn Error>> {
     let executable = config.get_build_dir().join(utils::file_name(main_file));
     if !executable.exists() {
         return Err(format!("Executable {} does not exist", executable.display()).into());
@@ -57,10 +63,14 @@ fn run<W: Write>(main_file: &str, config: &Config, out: &mut W) -> Result<(), Bo
 
     // use command to invoke the executable
     let mut run_cmd = Command::new(executable);
+    for arg in prog_args {
+        run_cmd.arg(arg);
+    }
 
     if env::var("VERBOSITY").unwrap_or_default() == "1" {
         writeln!(out, "{}", format!("{:?}", run_cmd).replace("\"", ""))?;
     }
+    writeln!(out, "")?;
 
     // pipe the output to out
     let run_project = run_cmd.output()?;

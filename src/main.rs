@@ -11,6 +11,10 @@ struct Cli {
     #[arg(value_name = "main")]
     main: String,
 
+    /// The arguments to pass to the main file
+    #[arg(value_name = "args")]
+    args: Vec<String>,
+
     /// The directory to use
     #[arg(short, long, default_value = ".")]
     dir: String,
@@ -41,7 +45,7 @@ fn main() {
     }
     let config = config.unwrap();
 
-    let result = execute(&args.main, config, &mut std::io::stdout());
+    let result = execute(&args.main, config, &mut std::io::stdout(), args.args);
     if result.is_err() {
         eprintln!("{}", format!("Error executing: {:?}", result).red());
         process::exit(1);
