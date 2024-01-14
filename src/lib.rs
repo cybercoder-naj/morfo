@@ -43,8 +43,13 @@ fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> Result<(), Box<
     }
 
     let status = compile_cmd.status()?;
-    if !status.success() {
-        return Err(format!("Error compiling {}", act.name).into());
+    match status.code() {
+        Some(code) => {
+            if code != 0 {
+                return Err(format!("Process terminated with code {}", code).into());
+            }
+        }
+        None => return Err("Process terminated by signal".into()),
     }
 
     Ok(())
@@ -77,27 +82,4 @@ fn run<W: Write>(
     out.write_all(&run_project.stdout)?;
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::config::ConfigBuilder;
-
-    use super::*;
-
-    #[test]
-    #[ignore]
-    fn test_execute() {
-        let mut out = Vec::new();
-        execute(
-            "examples/hello_world/main.c",
-            ConfigBuilder::default().set_cc("gcc").build(),
-            &mut out,
-        )
-        .unwrap();
-        assert_eq!(
-            String::from_utf8(out).unwrap(),
-            vec!["Hello World!", ""].join("\n")
-        );
-    }
 }

@@ -1,3 +1,5 @@
+mod builder;
+
 #[derive(Debug, PartialEq)]
 pub struct ACT {
     pub name: String,
