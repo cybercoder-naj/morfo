@@ -1,4 +1,11 @@
-use std::{env, error::Error, fs::create_dir, io::Write, path::Path, process::Command};
+use std::{
+    env,
+    error::Error,
+    fs::create_dir,
+    io::Write,
+    path::Path,
+    process::{Command, Stdio},
+};
 
 use act::ACT;
 use config::Config;
@@ -22,8 +29,8 @@ pub fn execute<W: Write>(
 
 fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> Result<(), Box<dyn Error>> {
     // create .out directory if it doesn't exist
-    if !Path::new(".out").exists() {
-        create_dir(".out")?;
+    if !Path::new(&config.get_build_dir()).exists() {
+        create_dir(config.get_build_dir())?;
     }
 
     for dependency in &act.dependencies {
@@ -71,6 +78,10 @@ fn run<W: Write>(
     for arg in prog_args {
         run_cmd.arg(arg);
     }
+    run_cmd
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .stdin(Stdio::inherit());
 
     if env::var("VERBOSITY").unwrap_or_default() == "1" {
         writeln!(out, "{}", format!("{:?}", run_cmd).replace("\"", ""))?;

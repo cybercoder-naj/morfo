@@ -15,10 +15,6 @@ struct Cli {
     #[arg(value_name = "args")]
     args: Vec<String>,
 
-    /// The directory to use
-    #[arg(short, long, default_value = ".")]
-    dir: String,
-
     /// The config file to use
     #[arg(long, value_name = "config")]
     config: Option<String>,

@@ -31,7 +31,7 @@ pub struct Config {
     cc: String,
     cflags: Vec<String>,
     builddir: Option<String>,
-    include: Option<Vec<String>>,
+    includes: Option<Vec<String>>,
 }
 
 impl Config {
@@ -94,7 +94,7 @@ impl Config {
     /// assert_eq!(config.get_include(), Vec::<String>::new());
     /// ```
     pub fn get_include(&self) -> Vec<String> {
-        self.include.clone().unwrap_or(vec![])
+        self.includes.clone().unwrap_or(vec![])
     }
 }
 
@@ -125,7 +125,7 @@ pub struct ConfigBuilder {
     cc: String,
     cflags: Vec<String>,
     build_dir: Option<PathBuf>,
-    include: Vec<PathBuf>,
+    includes: Vec<PathBuf>,
 }
 
 impl ConfigBuilder {
@@ -145,7 +145,7 @@ impl ConfigBuilder {
     }
 
     pub fn add_include(mut self, include: &str) -> Self {
-        self.include.push(Path::new(include).to_path_buf());
+        self.includes.push(Path::new(include).to_path_buf());
         self
     }
 
@@ -154,8 +154,8 @@ impl ConfigBuilder {
             cc: self.cc,
             cflags: self.cflags,
             builddir: self.build_dir.map(|p| p.to_str().unwrap().to_string()),
-            include: self
-                .include
+            includes: self
+                .includes
                 .iter()
                 .map(|p| p.to_str().unwrap().to_string())
                 .collect::<Vec<String>>()
