@@ -22,7 +22,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_all_includes() {
+    fn builder_get_all_includes() {
         // Create a temporary file
         let tmp_dir = tempfile::tempdir().unwrap();
         let tmp_file = tmp_dir.path().join("main.c");

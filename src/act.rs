@@ -30,7 +30,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_act_new() {
+    fn act_new() {
         let act = ACT::new("main.c");
         assert_eq!(
             act,

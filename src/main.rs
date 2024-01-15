@@ -1,8 +1,11 @@
-use std::{env, process};
+use std::{env, path::PathBuf, process};
 
 use clap::Parser;
 use colored::Colorize;
-use morfo::{config::parse_config_file, execute};
+use morfo::{
+    config::{find_config_file, parse_config_file},
+    execute,
+};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -17,7 +20,7 @@ struct Cli {
 
     /// The config file to use
     #[arg(long, value_name = "config")]
-    config: Option<String>,
+    config: Option<PathBuf>,
 
     /// Display all the build steps
     #[arg(short, long, default_value = "false")]
@@ -31,7 +34,19 @@ fn main() {
         env::set_var("VERBOSITY", "1");
     }
 
-    let config = parse_config_file(args.config.as_deref());
+    let config_path = args.config.unwrap_or_else(|| {
+        let config_path = find_config_file();
+        if config_path.is_err() {
+            eprintln!(
+                "{}",
+                format!("Error finding config file: {:?}", config_path).red()
+            );
+            process::exit(1);
+        }
+        config_path.unwrap()
+    });
+
+    let config = parse_config_file(config_path);
     if config.is_err() {
         eprintln!(
             "{}",

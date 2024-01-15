@@ -8,7 +8,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_act_file_name() {
+    fn utils_file_name() {
         assert_eq!(file_name("main.c"), "main");
 
         assert_eq!(file_name("src/main.cpp"), "main");
