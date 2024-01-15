@@ -301,7 +301,9 @@ mod tests {
         // Create a temporary file to write toml_contents to
         let toml_contents = r#"
             cc = 'gcc'
-            cflags = ['-Wall', '-Wextra']"#;
+            cflags = ['-Wall', '-Wextra']
+            builddir = ".build"
+            includes = ["src/include", "src/aux/include"]"#;
 
         let temp_dir = tempfile::tempdir().unwrap();
         let temp_path = temp_dir.path().join("config.toml");
@@ -316,5 +318,12 @@ mod tests {
         let config = config.unwrap();
         assert_eq!(config.cc, "gcc");
         assert_eq!(config.cflags, vec!["-Wall", "-Wextra"]);
+        assert!(config.builddir.is_some());
+        assert_eq!(config.builddir.unwrap(), ".build");
+        assert!(config.includes.is_some());
+        assert_eq!(
+            config.includes.unwrap(),
+            vec!["src/include", "src/aux/include"]
+        );
     }
 }
