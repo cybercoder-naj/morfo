@@ -1,8 +1,11 @@
+//! The configuration for morfo.
+//!
 //! This module contains the [`Config`] struct and [`ConfigBuilder`] struct.
-//! You can either use parse_config_file to parse a config file, or use the ConfigBuilder to create a config.
+//! You can either use [`parse_config_file`] to parse a config file, or use the ConfigBuilder to create a config.
 //!
 //! [`Config`]: struct.Config.html
 //! [`ConfigBuilder`]: struct.ConfigBuilder.html
+//! [`parse_config_file`]: fn.parse_config_file.html
 
 use std::{
     fs,

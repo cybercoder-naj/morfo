@@ -10,7 +10,7 @@
 //!
 //! fn main() {
 //!    let config = ConfigBuilder::default().build();
-//!    execute("main.c", &config, &mut std::io::stdout(), vec![]);
+//!    execute("main.c", config, &mut std::io::stdout(), vec![]);
 //! }
 //! ```
 
