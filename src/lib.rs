@@ -38,20 +38,20 @@ pub fn execute<W: Write>(
     prog_args: Vec<String>,
 ) -> MorfoResult<()> {
     let act = ACT::build(main_file);
-    compile(&act, &config, out)?;
+    compile(&act, &config)?;
 
-    run(main_file, &config, out, prog_args)?;
+    run(act, &config, out, prog_args)?;
     Ok(())
 }
 
-fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> MorfoResult<()> {
+fn compile(act: &ACT, config: &Config) -> MorfoResult<()> {
     // create .out directory if it doesn't exist
     if !Path::new(&config.get_build_dir()).exists() {
         create_dir(config.get_build_dir())?;
     }
 
     for dependency in &act.dependencies {
-        compile(dependency, config, out)?;
+        compile(dependency, config)?;
     }
 
     // use command to print pwd
@@ -63,7 +63,7 @@ fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> MorfoResult<()>
         .arg(config.get_build_dir().join(utils::file_name(&act.name)));
 
     if env::var("VERBOSITY").unwrap_or_default() == "1" {
-        writeln!(out, "{}", format!("{:?}", compile_cmd).replace("\"", ""))?;
+        println!("{}", format!("{:?}", compile_cmd).replace("\"", ""));
     }
 
     let status = compile_cmd.status()?;
@@ -80,12 +80,12 @@ fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> MorfoResult<()>
 }
 
 fn run<W: Write>(
-    main_file: &str,
+    act: ACT,
     config: &Config,
     out: &mut W,
     prog_args: Vec<String>,
 ) -> MorfoResult<()> {
-    let executable = config.get_build_dir().join(utils::file_name(main_file));
+    let executable = config.get_build_dir().join(utils::file_name(&act.name));
     if !executable.exists() {
         return Err(MorfoError::MissingExecutable);
     }
@@ -101,7 +101,7 @@ fn run<W: Write>(
         .stdin(Stdio::inherit());
 
     if env::var("VERBOSITY").unwrap_or_default() == "1" {
-        writeln!(out, "{}", format!("{:?}", run_cmd).replace("\"", ""))?;
+        println!("{}", format!("{:?}", run_cmd).replace("\"", ""));
     }
     writeln!(out, "")?;
 
