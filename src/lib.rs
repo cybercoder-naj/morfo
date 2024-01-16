@@ -103,7 +103,7 @@ fn run<W: Write>(
     if env::var("VERBOSITY").unwrap_or_default() == "1" {
         println!("{}", format!("{:?}", run_cmd).replace("\"", ""));
     }
-    writeln!(out, "")?;
+    println!("");
 
     // pipe the output to out
     let run_project = run_cmd.output()?;
