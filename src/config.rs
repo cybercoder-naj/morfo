@@ -253,6 +253,7 @@ pub fn parse_config_file(filepath: &PathBuf) -> MorfoResult<Config> {
 
 #[cfg(test)]
 mod tests {
+    use serial_test::serial;
     use std::{
         env,
         fs::{self, File},
@@ -262,6 +263,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[serial]
     fn config_find_local_file() {
         // SETUP
         let cargo_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -280,6 +282,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn config_find_global_file() {
         // SETUP
         let cargo_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
