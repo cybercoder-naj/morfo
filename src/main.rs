@@ -46,7 +46,7 @@ fn main() {
         config_path.unwrap()
     });
 
-    let config = parse_config_file(config_path);
+    let config = parse_config_file(&config_path);
     if config.is_err() {
         eprintln!(
             "{}",

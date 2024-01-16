@@ -1,8 +1,9 @@
 use std::{
-    error::Error,
     fs,
     path::{Path, PathBuf},
 };
+
+use crate::error::{MorfoError, MorfoResult};
 
 /// `Config` holds the configuration for the compiler.
 ///
@@ -25,12 +26,12 @@ use std::{
 ///     .build();
 ///
 /// assert_eq!(config.get_cc(), "gcc");
-/// assert_eq!(config.get_cflags(), &vec!["-O2"]);
+/// assert_eq!(config.get_cflags(), vec!["-O2"]);
 /// ```
 #[derive(Debug, serde::Deserialize)]
 pub struct Config {
     cc: String,
-    cflags: Vec<String>,
+    cflags: Option<Vec<String>>,
     builddir: Option<String>,
     includes: Option<Vec<String>>,
 }
@@ -58,10 +59,10 @@ impl Config {
     /// use morfo::config::ConfigBuilder;
     ///
     /// let config = ConfigBuilder::default().add_cflag("-O2").build();
-    /// assert_eq!(config.get_cflags(), &vec!["-O2"]);
+    /// assert_eq!(config.get_cflags(), vec!["-O2"]);
     /// ```
-    pub fn get_cflags(&self) -> &Vec<String> {
-        &self.cflags
+    pub fn get_cflags(&self) -> Vec<String> {
+        self.cflags.clone().unwrap_or_default()
     }
 
     /// Returns the build directory.
@@ -92,9 +93,9 @@ impl Config {
     /// use morfo::config::ConfigBuilder;
     ///
     /// let config = ConfigBuilder::default().build();
-    /// assert_eq!(config.get_include(), Vec::<String>::new());
+    /// assert_eq!(config.get_includes(), Vec::<String>::new());
     /// ```
-    pub fn get_include(&self) -> Vec<String> {
+    pub fn get_includes(&self) -> Vec<String> {
         self.includes.clone().unwrap_or(vec![])
     }
 }
@@ -117,9 +118,9 @@ impl Config {
 ///     .build();
 ///
 /// assert_eq!(config.get_cc(), "gcc");
-/// assert_eq!(config.get_cflags(), &vec!["-O2"]);
+/// assert_eq!(config.get_cflags(), vec!["-O2"]);
 /// assert_eq!(config.get_build_dir(), PathBuf::from(".out"));
-/// assert_eq!(config.get_include(), vec!["include"]);
+/// assert_eq!(config.get_includes(), vec!["include"]);
 /// ```
 #[derive(Default)]
 pub struct ConfigBuilder {
@@ -153,7 +154,7 @@ impl ConfigBuilder {
     pub fn build(self) -> Config {
         Config {
             cc: self.cc,
-            cflags: self.cflags,
+            cflags: Option::Some(self.cflags),
             builddir: self.build_dir.map(|p| p.to_str().unwrap().to_string()),
             includes: self
                 .includes
@@ -183,19 +184,19 @@ impl ConfigBuilder {
 /// ```
 /// let config_file = morfo::config::find_config_file();
 /// ```
-pub fn find_config_file() -> Result<PathBuf, Box<dyn Error>> {
+pub fn find_config_file() -> MorfoResult<PathBuf> {
     let local_config = Path::new("./morfo.toml");
     if local_config.exists() {
         return Ok(local_config.to_path_buf());
     }
 
-    let home = dirs::home_dir().ok_or("Could not retrieve home directory")?;
+    let home = dirs::home_dir().ok_or(MorfoError::MissingHomeDirectory)?;
     let global_config = home.join(".config/morfo/config.toml");
     let home_config = Path::new(&global_config);
     if home_config.exists() {
         Ok(home_config.to_path_buf())
     } else {
-        Err("No config file found".into())
+        Err(MorfoError::MissingConfigFile)
     }
 }
 
@@ -218,16 +219,21 @@ pub fn find_config_file() -> Result<PathBuf, Box<dyn Error>> {
 /// # Examples
 ///
 /// ```
-/// let config = morfo::config::parse_config_file(std::path::PathBuf::from("./morfo.toml"));
+/// use std::path::PathBuf;
+///
+/// let config = morfo::config::parse_config_file(&PathBuf::from("./morfo.toml"));
 /// ```
-pub fn parse_config_file(filepath: PathBuf) -> Result<Config, Box<dyn Error>> {
+pub fn parse_config_file(filepath: &PathBuf) -> MorfoResult<Config> {
     // assert the file exists
     if !filepath.exists() {
-        return Err("Config file does not exist".into());
+        return Err(MorfoError::FileNotFound(filepath.clone()));
     }
+
     // assert the file is a TOML file
-    if filepath.extension().unwrap() != "toml" {
-        return Err("Config file is not a TOML file".into());
+    let ext = filepath.extension().ok_or(MorfoError::InvalidUnicode)?;
+    if ext != "toml" {
+        let ext = ext.to_str().ok_or(MorfoError::InvalidUnicode)?;
+        return Err(MorfoError::InvalidConfigExtension(ext.to_owned()));
     }
 
     let config = fs::read_to_string(filepath)?;
@@ -311,19 +317,68 @@ mod tests {
         temp_file.write_all(toml_contents.as_bytes()).unwrap();
 
         // TEST FUNCTION
-        let config = parse_config_file(temp_path);
+        let config = parse_config_file(&temp_path);
 
         // ASSERTIONS
         assert!(config.is_ok());
         let config = config.unwrap();
         assert_eq!(config.cc, "gcc");
-        assert_eq!(config.cflags, vec!["-Wall", "-Wextra"]);
+        assert_eq!(config.cflags.unwrap(), vec!["-Wall", "-Wextra"]);
         assert!(config.builddir.is_some());
         assert_eq!(config.builddir.unwrap(), ".build");
         assert!(config.includes.is_some());
         assert_eq!(
             config.includes.unwrap(),
             vec!["src/include", "src/aux/include"]
+        );
+    }
+
+    #[test]
+    fn config_parse_filepath_does_not_exist() {
+        let filepath = PathBuf::from("something/that/does/not/exist.toml");
+        let config = parse_config_file(&filepath);
+
+        assert!(config.is_err());
+        assert_eq!(config.unwrap_err(), MorfoError::FileNotFound(filepath));
+    }
+
+    #[test]
+    fn config_parse_non_toml_file() {
+        // SETUP
+        // Create a temporary file to write some text to
+        let temp_dir = tempfile::tempdir().unwrap();
+        let temp_path = temp_dir.path().join("config.txt");
+        let mut temp_file = File::create(&temp_path).unwrap();
+        temp_file.write_all(b"some text").unwrap();
+
+        let config = parse_config_file(&temp_path);
+
+        assert!(config.is_err());
+        assert_eq!(
+            config.unwrap_err(),
+            MorfoError::InvalidConfigExtension("txt".to_owned())
+        );
+    }
+
+    #[test]
+    fn config_parse_invalid_toml_file() {
+        // SETUP
+        // Create a temporary file to write some text to
+        let temp_dir = tempfile::tempdir().unwrap();
+        let temp_path = temp_dir.path().join("config.toml");
+        let mut temp_file = File::create(&temp_path).unwrap();
+
+        let toml_contents = r#"
+            builddir = ".build"
+            includes = ["src/include", "src/aux/include"]"#;
+        write!(temp_file, "{}", toml_contents).unwrap();
+
+        let config = parse_config_file(&temp_path);
+
+        assert!(config.is_err());
+        assert_eq!(
+            config.unwrap_err(),
+            MorfoError::InvlidConfig("missing field `cc`".to_owned())
         );
     }
 }

@@ -12,6 +12,7 @@ use config::Config;
 
 mod act;
 pub mod config;
+pub mod error;
 mod utils;
 
 pub fn execute<W: Write>(
