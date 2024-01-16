@@ -1,6 +1,22 @@
+//! An automatic C/C++ compiler and runner.
+//!
+//! # Usage
+//!
+//! A basic usage to execute a C program to stdout would be:
+//!
+//! ```rust
+//! use morfo::act::ACT;
+//! use morfo::config::ConfigBuilder;
+//! use morfo::execute;
+//!
+//! fn main() {
+//!    let config = ConfigBuilder::default().build();
+//!    execute("main.c", &config, &mut std::io::stdout(), vec![]);
+//! }
+//! ```
+
 use std::{
     env,
-    error::Error,
     fs::create_dir,
     io::Write,
     path::Path,
@@ -9,6 +25,7 @@ use std::{
 
 use act::ACT;
 use config::Config;
+use error::{MorfoError, MorfoResult};
 
 mod act;
 pub mod config;
@@ -20,7 +37,7 @@ pub fn execute<W: Write>(
     config: Config,
     out: &mut W,
     prog_args: Vec<String>,
-) -> Result<(), Box<dyn Error>> {
+) -> MorfoResult<()> {
     let act = ACT::build(main_file);
     compile(&act, &config, out)?;
 
@@ -28,7 +45,7 @@ pub fn execute<W: Write>(
     Ok(())
 }
 
-fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> Result<(), Box<dyn Error>> {
+fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> MorfoResult<()> {
     // create .out directory if it doesn't exist
     if !Path::new(&config.get_build_dir()).exists() {
         create_dir(config.get_build_dir())?;
@@ -54,10 +71,10 @@ fn compile<W: Write>(act: &ACT, config: &Config, out: &mut W) -> Result<(), Box<
     match status.code() {
         Some(code) => {
             if code != 0 {
-                return Err(format!("Process terminated with code {}", code).into());
+                return Err(MorfoError::CompilationFailure(code.into()));
             }
         }
-        None => return Err("Process terminated by signal".into()),
+        None => return Err(MorfoError::CompilationFailure(Option::None)),
     }
 
     Ok(())
@@ -68,10 +85,10 @@ fn run<W: Write>(
     config: &Config,
     out: &mut W,
     prog_args: Vec<String>,
-) -> Result<(), Box<dyn Error>> {
+) -> MorfoResult<()> {
     let executable = config.get_build_dir().join(utils::file_name(main_file));
     if !executable.exists() {
-        return Err(format!("Executable {} does not exist", executable.display()).into());
+        return Err(MorfoError::MissingExecutable);
     }
 
     // use command to invoke the executable

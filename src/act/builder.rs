@@ -1,8 +1,11 @@
-use std::{error::Error, fs};
+use std::fs;
 
 use regex::Regex;
 
-pub fn get_all_includes(filepath: &str) -> Result<Vec<String>, Box<dyn Error>> {
+use crate::error::MorfoResult;
+
+#[allow(dead_code)]
+pub fn get_all_includes(filepath: &str) -> MorfoResult<Vec<String>> {
     let mut includes = Vec::new();
 
     let contents = fs::read_to_string(filepath)?;

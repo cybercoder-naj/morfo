@@ -1,4 +1,4 @@
-use std::{env, path::PathBuf, process};
+use std::{env, io, path::PathBuf, process};
 
 use clap::Parser;
 use colored::Colorize;
@@ -35,28 +35,18 @@ fn main() {
     }
 
     let config_path = args.config.unwrap_or_else(|| {
-        let config_path = find_config_file();
-        if config_path.is_err() {
-            eprintln!(
-                "{}",
-                format!("Error finding config file: {:?}", config_path).red()
-            );
+        find_config_file().unwrap_or_else(|e| {
+            eprintln!("{}", format!("{:?}", e).red());
             process::exit(1);
-        }
-        config_path.unwrap()
+        })
     });
 
-    let config = parse_config_file(&config_path);
-    if config.is_err() {
-        eprintln!(
-            "{}",
-            format!("Error parsing config file: {:?}", config).red()
-        );
+    let config = parse_config_file(&config_path).unwrap_or_else(|e| {
+        eprintln!("{}", format!("{:?}", e).red());
         process::exit(1);
-    }
-    let config = config.unwrap();
+    });
 
-    let result = execute(&args.main, config, &mut std::io::stdout(), args.args);
+    let result = execute(&args.main, config, &mut io::stdout(), args.args);
     if result.is_err() {
         eprintln!("{}", format!("Error executing: {:?}", result).red());
         process::exit(1);

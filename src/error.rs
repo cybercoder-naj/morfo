@@ -1,21 +1,35 @@
-use std::{fmt, path::PathBuf};
+//! Error handling for morfo.
 
+use std::{fmt, io::ErrorKind, path::PathBuf};
+
+/// A specialized [`Result`] type for Morfo operations.
+///
+/// [`Result`]: https://doc.rust-lang.org/std/result/enum.Result.html
 pub type MorfoResult<T> = Result<T, MorfoError>;
 
+/// You can use the `MorfoError` type to handle errors in your code.
 #[derive(PartialEq, Debug)]
 pub enum MorfoError {
+    CompilationFailure(Option<i32>),
     FileNotFound(PathBuf),
     InvlidConfig(String),
     InvalidConfigExtension(String),
     InvalidUnicode,
-    IoError(String),
+    IoError(ErrorKind),
     MissingConfigFile,
+    MissingExecutable,
     MissingHomeDirectory,
 }
 
 impl fmt::Display for MorfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
+            MorfoError::CompilationFailure(code) => match code {
+                Some(code) => {
+                    write!(f, "Compilation failure: Process exited with code {}", code)
+                }
+                None => write!(f, "Compilation failure: Process terminated by signal"),
+            },
             MorfoError::FileNotFound(path) => write!(f, "File not found: {}", path.display()),
             MorfoError::InvlidConfig(msg) => write!(f, "Invalid config: {}", msg),
             MorfoError::InvalidConfigExtension(ext) => {
@@ -23,15 +37,16 @@ impl fmt::Display for MorfoError {
             }
             MorfoError::InvalidUnicode => write!(f, "Invalid unicode"),
             MorfoError::MissingConfigFile => write!(f, "Config file missing."),
+            MorfoError::MissingExecutable => write!(f, "Executable file missing."),
             MorfoError::MissingHomeDirectory => write!(f, "Home directory missing"),
-            MorfoError::IoError(error) => write!(f, "IO error: {}", error),
+            MorfoError::IoError(kind) => write!(f, "IO error: {}", kind),
         }
     }
 }
 
 impl From<std::io::Error> for MorfoError {
     fn from(error: std::io::Error) -> Self {
-        MorfoError::IoError(error.to_string())
+        MorfoError::IoError(error.kind())
     }
 }
 
