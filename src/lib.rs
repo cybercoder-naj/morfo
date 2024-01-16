@@ -5,7 +5,6 @@
 //! A basic usage to execute a C program to stdout would be:
 //!
 //! ```rust
-//! use morfo::act::ACT;
 //! use morfo::config::ConfigBuilder;
 //! use morfo::execute;
 //!
