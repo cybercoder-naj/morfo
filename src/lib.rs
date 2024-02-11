@@ -56,8 +56,11 @@ fn compile(act: &ACT, config: &Config) -> MorfoResult<()> {
 
     // use command to print pwd
     let mut compile_cmd = Command::new(config.get_cc());
+    if config.get_cflags().len() != 0 {
+        compile_cmd
+            .arg(config.get_cflags().join(" ").as_str());
+    }
     compile_cmd
-        .arg(config.get_cflags().join(" ").as_str())
         .arg(&act.name)
         .arg("-o")
         .arg(config.get_build_dir().join(utils::file_name(&act.name)));
