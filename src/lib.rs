@@ -58,7 +58,7 @@ fn compile(act: &ACT, config: &Config) -> MorfoResult<()> {
 
     // use command to print pwd
     let mut compile_cmd = Command::new(config.get_cc());
-    if config.get_cflags().len() != 0 {
+    if !config.get_cflags().is_empty() {
         compile_cmd.arg(config.get_cflags().join(" ").as_str());
     }
     compile_cmd
@@ -67,7 +67,7 @@ fn compile(act: &ACT, config: &Config) -> MorfoResult<()> {
         .arg(config.get_build_dir().join(utils::file_name(&act.name)));
 
     if env::var("VERBOSITY").unwrap_or_default() == "1" {
-        println!("{}", format!("{:?}", compile_cmd).replace("\"", ""));
+        println!("{}", format!("{:?}", compile_cmd).replace('\"', ""));
     }
 
     let status = compile_cmd.status()?;
@@ -102,9 +102,9 @@ fn run<W: Write>(
     run_cmd.stdin(Stdio::inherit());
 
     if env::var("VERBOSITY").unwrap_or_default() == "1" {
-        println!("{}", format!("{:?}", run_cmd).replace("\"", ""));
+        println!("{}", format!("{:?}", run_cmd).replace('\"', ""));
     }
-    println!("");
+    println!();
 
     // pipe the output to out
     let run_project = run_cmd.output()?;

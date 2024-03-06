@@ -51,7 +51,7 @@ mod tests {
         let other_file = root.join("main.rs");
 
         fs::write(&c_file, "").unwrap();
-        fs::write(&other_file, "").unwrap();
+        fs::write(other_file, "").unwrap();
 
         let dir_info = get_dir_info(root);
         assert_eq!(dir_info.header_files, Vec::<PathBuf>::new());

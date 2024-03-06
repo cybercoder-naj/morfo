@@ -1,6 +1,6 @@
 pub fn file_name(path: &str) -> String {
-    let file_name = path.split("/").last().unwrap().to_string();
-    file_name.split(".").next().unwrap().to_string()
+    let file_name = path.split('/').last().unwrap().to_string();
+    file_name.split('.').next().unwrap().to_string()
 }
 
 #[cfg(test)]

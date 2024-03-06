@@ -105,7 +105,7 @@ impl Config {
     /// assert_eq!(config.get_includes(), Vec::<String>::new());
     /// ```
     pub fn get_includes(&self) -> Vec<String> {
-        self.includes.clone().unwrap_or(vec![])
+        self.includes.clone().unwrap_or_default()
     }
 }
 
