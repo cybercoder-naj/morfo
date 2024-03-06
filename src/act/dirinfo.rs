@@ -2,11 +2,55 @@ use std::path::{Path, PathBuf};
 
 use walkdir::WalkDir;
 
+/// Struct to hold the header and c files found in a directory
+///
+/// # Fields
+///
+/// * `header_files` - A vector of PathBufs containing the header files found
+/// * `c_files` - A vector of PathBufs containing the c files found
+///
+/// # Example
+///
+/// ```ignore
+/// use morfo::act::dirinfo::DirInfo;
+/// use std::path::PathBuf;
+///
+/// let header_files = vec![PathBuf::from("path/to/header.h")];
+/// let c_files = vec![PathBuf::from("path/to/main.c")];
+///
+/// let dir_info = DirInfo {
+///    header_files,
+///   c_files,
+/// };
+/// ```
 pub struct DirInfo {
     pub header_files: Vec<PathBuf>,
     pub c_files: Vec<PathBuf>,
 }
 
+/// Get all the c and h files in the subdirectories of the given root
+///
+/// # Arguments
+///
+/// * `root` - The root directory to search for c and h files
+///
+/// # Returns
+///
+/// A DirInfo struct containing the header and c files found
+///
+/// # Example
+///
+/// ```ignore
+/// use morfo::act::dirinfo::get_dir_info;
+/// use std::path::Path;
+///
+/// let root = Path::new("path/to/root");
+/// let dir_info = get_dir_info(root);
+/// ```
+///
+/// # Panics
+///
+/// This function panics if the root directory does not exist
 pub fn get_dir_info(root: &Path) -> DirInfo {
     let mut header_files = Vec::new();
     let mut c_files = Vec::new();
