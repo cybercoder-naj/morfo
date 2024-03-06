@@ -22,6 +22,7 @@ serde = { version = "1.0.194", features = ["derive"] }
 serial_test = "3.0.0"
 tempfile = "3.9.0"
 toml = "0.8.8"
+walkdir = "2.4.0"
 
 [profile.dev]
 debug = true

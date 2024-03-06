@@ -12,7 +12,7 @@ use morfo::{
 struct Cli {
     /// The main file to execute
     #[arg(value_name = "main")]
-    main: String,
+    main: PathBuf,
 
     /// The arguments to pass to the main file
     #[arg(value_name = "args")]
@@ -46,7 +46,7 @@ fn main() {
         process::exit(1);
     });
 
-    let result = execute(&args.main, config, &mut io::stdout(), args.args);
+    let result = execute(args.main, config, &mut io::stdout(), args.args);
     if result.is_err() {
         eprintln!("{}", format!("Error executing: {:?}", result).red());
         process::exit(1);

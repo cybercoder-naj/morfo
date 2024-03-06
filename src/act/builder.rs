@@ -1,11 +1,11 @@
-use std::fs;
+use std::{fs, path::PathBuf};
 
 use regex::Regex;
 
 use crate::error::MorfoResult;
 
 #[allow(dead_code)]
-pub fn get_all_includes(filepath: &str) -> MorfoResult<Vec<String>> {
+pub fn get_all_includes(filepath: &PathBuf) -> MorfoResult<Vec<String>> {
     let mut includes = Vec::new();
 
     let contents = fs::read_to_string(filepath)?;
@@ -42,7 +42,7 @@ mod tests {
         // create path to tmp_file
         let temp_file = tmp_file.to_str().unwrap();
 
-        let includes = get_all_includes(temp_file).unwrap();
+        let includes = get_all_includes(&PathBuf::from(temp_file)).unwrap();
         assert_eq!(includes, vec!["aux.h"]);
     }
 }

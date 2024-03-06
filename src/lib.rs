@@ -4,13 +4,13 @@
 //!
 //! A basic usage to execute a C program to stdout would be:
 //!
-//! ```rust
+//! ```no_run
 //! use morfo::config::ConfigBuilder;
 //! use morfo::execute;
 //!
 //! fn main() {
 //!    let config = ConfigBuilder::default().build();
-//!    execute("main.c", config, &mut std::io::stdout(), vec![]);
+//!    execute("main.c".into(), config, &mut std::io::stdout(), vec![]);
 //! }
 //! ```
 
@@ -18,7 +18,7 @@ use std::{
     env,
     fs::create_dir,
     io::Write,
-    path::Path,
+    path::{Path, PathBuf},
     process::{Command, Stdio},
 };
 
@@ -32,12 +32,14 @@ pub mod error;
 mod utils;
 
 pub fn execute<W: Write>(
-    main_file: &str,
+    main_file: PathBuf,
     config: Config,
     out: &mut W,
     prog_args: Vec<String>,
 ) -> MorfoResult<()> {
-    let act = ACT::build(main_file);
+    let dirinfo = act::dirinfo::get_dir_info(&main_file);
+
+    let act = ACT::build(&main_file, &dirinfo);
     compile(&act, &config)?;
 
     run(act, &config, out, prog_args)?;
@@ -57,8 +59,7 @@ fn compile(act: &ACT, config: &Config) -> MorfoResult<()> {
     // use command to print pwd
     let mut compile_cmd = Command::new(config.get_cc());
     if config.get_cflags().len() != 0 {
-        compile_cmd
-            .arg(config.get_cflags().join(" ").as_str());
+        compile_cmd.arg(config.get_cflags().join(" ").as_str());
     }
     compile_cmd
         .arg(&act.name)
@@ -98,10 +99,7 @@ fn run<W: Write>(
     for arg in prog_args {
         run_cmd.arg(arg);
     }
-    run_cmd
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .stdin(Stdio::inherit());
+    run_cmd.stdin(Stdio::inherit());
 
     if env::var("VERBOSITY").unwrap_or_default() == "1" {
         println!("{}", format!("{:?}", run_cmd).replace("\"", ""));
