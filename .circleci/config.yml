@@ -2,7 +2,6 @@ version: 2.1
 
 jobs:
   test:
-    working_directory: ~/morfo
     docker:
       - image: cimg/rust:1.75.0
     steps:
@@ -33,7 +32,6 @@ jobs:
     steps:
       - checkout
       - run: ./check_version.sh
-    
 
 workflows:
   main:
@@ -49,14 +47,14 @@ workflows:
       - test:
           filters:
             tags:
-              only: 
+              only:
                 - /^v.*/
             branches:
               ignore: /.*/
       - lint:
           filters:
             tags:
-              only: 
+              only:
                 - /^v.*/
             branches:
               ignore: /.*/
@@ -66,7 +64,7 @@ workflows:
             - lint
           filters:
             tags:
-              only: 
+              only:
                 - /^v.*/
             branches:
               ignore: /.*/

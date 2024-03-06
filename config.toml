@@ -5,3 +5,6 @@ cc = "gcc"
 
 # The flags to pass to the compiler on every invocation
 cflags = ["-g"]
+
+# The folder to put the compiled files in
+builddir = ".out"
